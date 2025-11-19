@@ -70,3 +70,42 @@ int CartePosee(int index_jeu, int index_joueur, Carte *jeu) {
     }
     return 0;
 }
+
+
+
+void appliquerEffet(Carte carte, int *tour_suivant_skip) {
+    if (strcmp(carte.type, "+2") == 0) {
+        cartes_a_piocher += 2;
+        printf(">> +2! Total a piocher: %d cartes.\n", cartes_a_piocher);
+    }
+    else if (strcmp(carte.type, "PS") == 0) {
+        *tour_suivant_skip = 1;
+        printf(">> Passer! Le joueur suivant passe son tour.\n");
+    }
+    else if (strcmp(carte.type, "RV") == 0) {
+        sens_jeu *= -1;
+        printf(">> Inversion! Le sens change.\n");
+    }
+}
+
+char choisirCouleur() {
+    char choix;
+    printf("Choisissez une couleur (R/J/B/V): ");
+    scanf(" %c", &choix);
+    while (getchar() != '\n');
+    
+    if (choix != 'R' && choix != 'J' && choix != 'B' && choix != 'V') {
+        printf("Couleur invalide, rouge par defaut.\n");
+        return 'R';
+    }
+    return choix;
+}
+
+int peutContrer(int *main, int taille, Carte *jeu) {
+    for (int i = 0; i < taille; i++) {
+        if (strcmp(jeu[main[i]].type, "+2") == 0) {
+            return 1;
+        }
+    }
+    return 0;
+}
