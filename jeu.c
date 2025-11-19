@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 
-
+int sens_jeu = 1;
 int cartes_a_piocher = 0;
 char couleur_joker = 'N';
 

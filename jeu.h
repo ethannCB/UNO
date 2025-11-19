@@ -3,7 +3,7 @@
 
 #include "carte.h"
 
-
+extern int sens_jeu;
 extern int cartes_a_piocher;
 extern char couleur_joker;
 
@@ -14,5 +14,5 @@ int piocherCarte(int *main_joueur, int *taille_main, int *taille_deck, Carte *je
 int CartePosee(int index_jeu, int index_joueur, Carte *jeu);
 void appliquerEffet(Carte carte, int *tour_suivant_skip);
 char choisirCouleur();
-
+int peutContrer(int *main, int taille, Carte *jeu);
 #endif
