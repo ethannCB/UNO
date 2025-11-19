@@ -58,3 +58,7 @@ void MelangerJeu(Carte *jeu, int taille) {
         jeu[j] = temp;
     }
 }
+
+void affiche_carte(int index_jeu, Carte *jeu) {
+    printf("%s %c\n", jeu[index_jeu].type, jeu[index_jeu].couleur);
+}

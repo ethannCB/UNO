@@ -11,3 +11,6 @@ typedef struct {
 void afficherCarte(Carte carte);
 int creerJeuUNO(Carte *jeu);
 void MelangerJeu(Carte *jeu, int taille);
+void affiche_carte(int index_jeu, Carte *jeu);
+
+#endif
