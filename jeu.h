@@ -15,4 +15,7 @@ int CartePosee(int index_jeu, int index_joueur, Carte *jeu);
 void appliquerEffet(Carte carte, int *tour_suivant_skip);
 char choisirCouleur();
 int peutContrer(int *main, int taille, Carte *jeu);
+int tour(int carte_joueur[], int *taille_main, Carte *jeu, int carte_pile, int *taille_deck, int *skip);
+int verifierBluff(int *main_joueur, int taille, Carte *jeu, int carte_pile);
+
 #endif
