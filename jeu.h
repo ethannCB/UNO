@@ -17,5 +17,7 @@ char choisirCouleur();
 int peutContrer(int *main, int taille, Carte *jeu);
 int tour(int carte_joueur[], int *taille_main, Carte *jeu, int carte_pile, int *taille_deck, int *skip);
 int verifierBluff(int *main_joueur, int taille, Carte *jeu, int carte_pile);
+void afficherMain(int carte_joueur[], int taille_main, Carte *jeu);
+int tourJoueur(int carte_joueur[], int *taille_main, Carte *jeu, int carte_pile, int *taille_deck, int *skip);
 
 #endif

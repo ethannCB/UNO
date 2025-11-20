@@ -196,8 +196,8 @@ int tour(int carte_joueur[], int *taille_main, Carte *jeu, int carte_pile, int *
     printf("IA pioche.\n");
     int nouvelle_carte = piocherCarte(carte_joueur, taille_main, taille_deck, jeu);
     
-    // verifie si la carte piochée peut être jouée
-    if (nouvelle_carte >= 0 && CartePosee(carte_pile, nouvelle_carte, jeu)) {
+    
+    if (nouvelle_carte >= 0 && CartePosee(carte_pile, nouvelle_carte, jeu)) {// verifie si la carte piochée peut être jouée
         printf("IA peut jouer la carte piochee!\n");
         (*taille_main)--;
         printf("IA pose : ");
@@ -217,3 +217,39 @@ int tour(int carte_joueur[], int *taille_main, Carte *jeu, int carte_pile, int *
     return carte_pile;
 }
 
+
+void afficherMain(int carte_joueur[], int taille_main, Carte *jeu) {
+    printf("\nVos cartes:\n");
+    for (int i = 0; i < taille_main; i++) {
+        printf("%d. ", i + 1);
+        affiche_carte(carte_joueur[i], jeu);
+    }
+}
+
+
+
+int tourJoueur(int carte_joueur[], int *taille_main, Carte *jeu, int carte_pile, int *taille_deck, int *skip) {
+    if (*skip) {
+        printf("Vous passez votre tour.\n");
+        printf("Appuyez sur Entree...");
+        while (getchar() != '\n');
+        *skip = 0;
+        return carte_pile;
+    }
+    
+    // Gérer les +2
+    if (cartes_a_piocher > 0 && strcmp(jeu[carte_pile].type, "+2") == 0) {
+        if (peutContrer(carte_joueur, *taille_main, jeu)) {
+            printf("Vous devez piocher %d cartes OU poser un +2!\n", cartes_a_piocher);
+        } else {
+            printf("Vous devez piocher %d cartes!\n", cartes_a_piocher);
+            for (int i = 0; i < cartes_a_piocher; i++) {
+                piocherCarte(carte_joueur, taille_main, taille_deck, jeu);
+            }
+            cartes_a_piocher = 0;
+            couleur_joker = 'N';
+            printf("Appuyez sur Entree...");
+            while (getchar() != '\n');
+            return carte_pile;
+        }
+    }
