@@ -253,3 +253,175 @@ int tourJoueur(int carte_joueur[], int *taille_main, Carte *jeu, int carte_pile,
             return carte_pile;
         }
     }
+    
+    // Gérer les +4
+    if (cartes_a_piocher == 4 && strcmp(jeu[carte_pile].type, "+4") == 0) {
+        char reponse;
+        scanf(" %c", &reponse);
+        while (getchar() != '\n');
+        //partie faites avec IA car je n'y arrivais pas
+        if (reponse == 'o' || reponse == 'O') {
+            printf("Vous appelez au bluff!\n");
+            // Simuler la vérification (en réalité il faudrait garder la main de l'IA)
+            int bluff = rand() % 2; // 50% de chance
+            
+            if (bluff) {
+                printf("BLUFF! L'IA pioche 4 cartes.\n");
+                cartes_a_piocher = 0;
+            } else {
+                printf("PAS DE BLUFF! Vous piochez 6 cartes.\n");
+                for (int i = 0; i < 6; i++) {
+                    piocherCarte(carte_joueur, taille_main, taille_deck, jeu);
+                }
+                cartes_a_piocher = 0;
+            }
+            couleur_joker = 'N';
+            printf("Appuyez sur Entree...");
+            while (getchar() != '\n');
+            return carte_pile;
+        } else {
+            printf("Vous piochez 4 cartes.\n");
+            for (int i = 0; i < 4; i++) {
+                piocherCarte(carte_joueur, taille_main, taille_deck, jeu);
+            }
+            cartes_a_piocher = 0;
+            couleur_joker = 'N';
+            printf("Appuyez sur Entree...");
+            while (getchar() != '\n');
+            return carte_pile;
+        }
+    }
+    
+    afficherMain(carte_joueur, *taille_main, jeu);
+    
+    printf("\nCarte a battre: ");
+    affiche_carte(carte_pile, jeu);
+    if (couleur_joker != 'N') {
+        printf("Couleur du joker: %c\n", couleur_joker);
+    }
+    
+    while (1) {
+        printf("\nQuelle carte? (1-%d) ou 0 pour piocher: ", *taille_main);
+        
+        int choix;
+        scanf("%d", &choix);
+        while (getchar() != '\n');
+        
+        if (choix == 0) {
+            printf("Vous piochez.\n");
+            int nouvelle_carte = piocherCarte(carte_joueur, taille_main, taille_deck, jeu);
+            
+            if (nouvelle_carte >= 0 && CartePosee(carte_pile, nouvelle_carte, jeu)) {
+                printf("Vous pouvez jouer cette carte! Voulez-vous la jouer? (o/n): ");
+                char rep;
+                scanf(" %c", &rep);
+                while (getchar() != '\n');
+                
+                if (rep == 'o' || rep == 'O') {
+                    (*taille_main)--;
+                    printf("Vous posez: ");
+                    affiche_carte(nouvelle_carte, jeu);
+                    
+                    if (strcmp(jeu[nouvelle_carte].type, "JJ") == 0) {
+                        couleur_joker = choisirCouleur();
+                        printf("Couleur choisie: %c\n", couleur_joker);
+                    }
+                    else if (strcmp(jeu[nouvelle_carte].type, "+4") == 0) {
+                        couleur_joker = choisirCouleur();
+                        cartes_a_piocher = 4;
+                        printf("Couleur choisie: %c\n", couleur_joker);
+                    }
+                    else {
+                        appliquerEffet(jeu[nouvelle_carte], skip);
+                        couleur_joker = 'N';
+                    }
+                    
+                    
+                    if (*taille_main == 1) {  //si il ne reste qu'une carte et qu'il vient de piocher et qu'il la pose
+                        printf("\nDerniere carte! Tapez UNO ou appuyez sur Entree: ");
+                        char buffer[10];
+                        fgets(buffer, sizeof(buffer), stdin); //lit la ligne entrée sans bug si entrée précédente
+                        
+                        if (strstr(buffer, "UNO") != NULL || strstr(buffer, "uno") != NULL) { //la ligne contient \n donc on utilise strstr
+                            printf("UNO!\n");
+                        } else {
+                            printf("OUBLI DE UNO! Vous piochez 2 cartes.\n");
+                            piocherCarte(carte_joueur, taille_main, taille_deck, jeu);
+                            piocherCarte(carte_joueur, taille_main, taille_deck, jeu);
+                        }
+                    } else if (*taille_main > 1) {
+                        printf("Appuyez sur Entree...");
+                        while (getchar() != '\n');
+                    }
+                    
+                    return nouvelle_carte;
+                }
+            }
+            
+            couleur_joker = 'N';
+            printf("Appuyez sur Entree...");
+            while (getchar() != '\n');
+            return carte_pile;
+        }
+        
+        if (choix < 1 || choix > *taille_main) {
+            printf("Erreur: choisissez entre 1 et %d\n", *taille_main);
+            continue;
+        }
+        
+        int index = choix - 1;
+        
+        if (CartePosee(carte_pile, carte_joueur[index], jeu)) {  // si la carte choisie peut être posée
+            int carte_posee = carte_joueur[index];
+            
+            for (int j = index; j < *taille_main - 1; j++) {
+                carte_joueur[j] = carte_joueur[j + 1];
+            }
+            (*taille_main)--;
+            
+            printf("Vous posez: ");
+            affiche_carte(carte_posee, jeu);
+            
+            // Gérer les jokers
+            if (strcmp(jeu[carte_posee].type, "JJ") == 0) {
+                couleur_joker = choisirCouleur();
+                printf("Couleur choisie: %c\n", couleur_joker);
+            }
+            else if (strcmp(jeu[carte_posee].type, "+4") == 0) {
+                couleur_joker = choisirCouleur();
+                cartes_a_piocher = 4;
+                printf("Couleur choisie: %c\n", couleur_joker);
+            }
+            else {
+                appliquerEffet(jeu[carte_posee], skip);
+                couleur_joker = 'N';
+            }
+            
+            
+            if (*taille_main == 1) {  // si il ne reste qu'une carte
+                printf("\nDerniere carte! Tapez UNO ou appuyez sur Entree: ");
+                char buffer[10];
+                fgets(buffer, sizeof(buffer), stdin);
+                
+                if (strstr(buffer, "UNO") != NULL || strstr(buffer, "uno") != NULL) {
+                    printf("UNO!\n");
+                } else {
+                    printf("OUBLI DE UNO! Vous piochez 2 cartes.\n");
+                    piocherCarte(carte_joueur, taille_main, taille_deck, jeu);
+                    piocherCarte(carte_joueur, taille_main, taille_deck, jeu);
+                }
+            } else if (*taille_main > 1) {
+                printf("Appuyez sur Entree...");
+                while (getchar() != '\n');
+            }
+            
+            return carte_posee;
+        } else {
+            printf("Erreur: cette carte ne va pas!\n");
+        }
+    }
+}
+
+int win(int taille_main) {
+    return (taille_main == 0);
+}

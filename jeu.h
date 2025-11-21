@@ -19,5 +19,6 @@ int tour(int carte_joueur[], int *taille_main, Carte *jeu, int carte_pile, int *
 int verifierBluff(int *main_joueur, int taille, Carte *jeu, int carte_pile);
 void afficherMain(int carte_joueur[], int taille_main, Carte *jeu);
 int tourJoueur(int carte_joueur[], int *taille_main, Carte *jeu, int carte_pile, int *taille_deck, int *skip);
+int win(int taille_main);
 
 #endif
