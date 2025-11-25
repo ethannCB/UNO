@@ -1,62 +1,36 @@
-# ============================================
-# Makefile pour le projet TP4_Algo (jeu UNO)
-# ============================================
+# Makefile pour le jeu UNO
 
-# Variables (tu peux les modifier)
-CC = gcc                           # Compilateur C
-CFLAGS = -Wall -Wextra -std=c99    # Flags de compilation avec warnings
-TARGET = jeu.exe                   # Nom de l'exécutable à créer
-SOURCES = carte.c jeu.c main.c     # Fichiers sources (.c) à compiler
-OBJECTS = carte.o jeu.o main.o     # Fichiers objets intermédiaires (.o)
-HEADERS = carte.h jeu.h            # Fichiers en-têtes (.h)
+CC = gcc
+CFLAGS = -Wall -Wextra -std=c99
+TARGET = uno
+OBJS = main.o carte.o jeu.o
 
-# ============================================
-# Règles (cibles) du Makefile
-# ============================================
-
-# Cible par défaut (celle exécutée si tu tapes juste "make")
+# Règle principale
 all: $(TARGET)
 
-# Créer l'exécutable jeu.exe à partir des fichiers objets
-$(TARGET): $(OBJECTS)
-	$(CC) $(CFLAGS) -o $(TARGET) $(OBJECTS)
-	@echo "✓ Compilation réussie ! Exécutable: $(TARGET)"
+# Compilation de l'exécutable
+$(TARGET): $(OBJS)
+	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS)
 
-# Compiler carte.c en carte.o
-carte.o: carte.c $(HEADERS)
-	$(CC) $(CFLAGS) -c carte.c
-	@echo "✓ Compilation de carte.c réussie"
-
-# Compiler jeu.c en jeu.o
-jeu.o: jeu.c $(HEADERS)
-	$(CC) $(CFLAGS) -c jeu.c
-	@echo "✓ Compilation de jeu.c réussie"
-
-# Compiler main.c en main.o
-main.o: main.c $(HEADERS)
+# Compilation des fichiers objets
+main.o: main.c carte.h jeu.h
 	$(CC) $(CFLAGS) -c main.c
-	@echo "✓ Compilation de main.c réussie"
 
-# Nettoyer les fichiers générés (.o et .exe)
+carte.o: carte.c carte.h
+	$(CC) $(CFLAGS) -c carte.c
+
+jeu.o: jeu.c jeu.h carte.h
+	$(CC) $(CFLAGS) -c jeu.c
+
+# Nettoyage
 clean:
-	del $(OBJECTS) $(TARGET) 2>nul || true
-	@echo "✓ Fichiers nettoyés"
+	rm -f $(OBJS) $(TARGET)
 
-# Recompiler tout (clean + all)
+# Recompilation complète
 rebuild: clean all
 
-# Compiler et exécuter
+# Exécution
 run: $(TARGET)
-	.\$(TARGET)
+	./$(TARGET)
 
-# Afficher de l'aide
-help:
-	@echo "Commandes disponibles:"
-	@echo "  make              - Compiler le projet (crée jeu.exe)"
-	@echo "  make run          - Compiler et exécuter"
-	@echo "  make clean        - Supprimer les fichiers compilés"
-	@echo "  make rebuild      - Nettoyer et recompiler"
-	@echo "  make help         - Afficher cette aide"
-
-# Éviter que make confonde les cibles avec des fichiers réels
-.PHONY: all clean rebuild run help
+.PHONY: all clean rebuild run

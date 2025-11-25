@@ -5,7 +5,7 @@
 
 extern int sens_jeu;
 extern int cartes_a_piocher;
-extern char couleur_joker;
+extern char couleur_active;
 
 
 int distribuer_carte(int carte_joueur[], int carte_ia[], Carte *jeu, int taille);

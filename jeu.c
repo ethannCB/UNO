@@ -4,7 +4,7 @@
 
 int sens_jeu = 1;
 int cartes_a_piocher = 0;
-char couleur_joker = 'N';
+char couleur_active = 'N';  // Variable globale pour la couleur active
 
 
 
@@ -56,18 +56,15 @@ int CartePosee(int index_jeu, int index_joueur, Carte *jeu) {
         return 1;
     }
     
-    // Si un joker a été joué, vérifier la couleur choisie
-    char couleur_a_battre = jeu[index_jeu].couleur;
-    if (couleur_joker != 'N') {
-        couleur_a_battre = couleur_joker;
-    }
+    // Déterminer la couleur à battre
+    char couleur_a_battre = (couleur_active != 'N') ? couleur_active : jeu[index_jeu].couleur;
     
     // Si on doit contrer un +2, seul un +2 peut être joué
     if (cartes_a_piocher > 0 && strcmp(jeu[index_jeu].type, "+2") == 0) {
         return strcmp(jeu[index_joueur].type, "+2") == 0;
     }
     
-    // Vérifier la couleur ou le type
+    // Vérifier la couleur - Si la carte correspond, on réinitialise couleur_active
     if (jeu[index_joueur].couleur == couleur_a_battre) {
         return 1;
     }
@@ -112,8 +109,10 @@ char choisirCouleur() {
     
     if (choix != 'R' && choix != 'J' && choix != 'B' && choix != 'V') {
         printf("Couleur invalide, rouge par defaut.\n");
+        couleur_active = 'R';
         return 'R';
     }
+    couleur_active = choix;
     return choix;
 }
 
@@ -172,7 +171,7 @@ int tour(int carte_joueur[], int *taille_main, Carte *jeu, int carte_pile, int *
                 piocherCarte(carte_joueur, taille_main, taille_deck, jeu);
             }
             cartes_a_piocher = 0;
-            couleur_joker = 'N';
+            couleur_active = 'N';
             return carte_pile;
         }
     }
@@ -193,19 +192,19 @@ int tour(int carte_joueur[], int *taille_main, Carte *jeu, int carte_pile, int *
             
             if (strcmp(jeu[carte_posee].type, "JJ") == 0) {    // regarde la carte posée si joker applique l'effet
                 char couleurs[] = {'R', 'J', 'B', 'V'};
-                couleur_joker = couleurs[rand() % 4];
-                printf("IA choisit la couleur: %c\n", couleur_joker);
+                couleur_active = couleurs[rand() % 4];
+                printf("IA choisit la couleur: %c\n", couleur_active);
             }
             else if (strcmp(jeu[carte_posee].type, "+4") == 0) {    // regarde la carte posée si +4 applique l'effet
                 char couleurs[] = {'R', 'J', 'B', 'V'};
-                couleur_joker = couleurs[rand() % 4];
+                couleur_active = couleurs[rand() % 4];
                 cartes_a_piocher = 4;
-                printf("IA choisit la couleur: %c\n", couleur_joker);
+                printf("IA choisit la couleur: %c\n", couleur_active);
                 printf(">> +4! Voulez-vous appeler au bluff? (o/n): ");
             }
             else {
                 appliquerEffet(jeu[carte_posee], skip);
-                couleur_joker = 'N';
+                couleur_active = 'N';
             }
             
             if (*taille_main == 1) {  // UNO pour l'IA
@@ -229,14 +228,14 @@ int tour(int carte_joueur[], int *taille_main, Carte *jeu, int carte_pile, int *
         if (strcmp(jeu[nouvelle_carte].type, "JJ") == 0 || 
             strcmp(jeu[nouvelle_carte].type, "+4") == 0) {
             char couleurs[] = {'R', 'J', 'B', 'V'};
-            couleur_joker = couleurs[rand() % 4];
-            printf("IA choisit la couleur: %c\n", couleur_joker);
+            couleur_active = couleurs[rand() % 4];
+            printf("IA choisit la couleur: %c\n", couleur_active);
         }
         
         return nouvelle_carte;
     }
     
-    couleur_joker = 'N';
+    couleur_active = 'N';
     return carte_pile;
 }
 
@@ -271,7 +270,7 @@ int tourJoueur(int carte_joueur[], int *taille_main, Carte *jeu, int carte_pile,
                 piocherCarte(carte_joueur, taille_main, taille_deck, jeu);
             }
             cartes_a_piocher = 0;
-            couleur_joker = 'N';
+            couleur_active = 'N';
             printf("Appuyez sur Entree...");
             while (getchar() != '\n');
             return carte_pile;
@@ -299,7 +298,7 @@ int tourJoueur(int carte_joueur[], int *taille_main, Carte *jeu, int carte_pile,
                 }
                 cartes_a_piocher = 0;
             }
-            couleur_joker = 'N';
+            couleur_active = 'N';
             printf("Appuyez sur Entree...");
             while (getchar() != '\n');
             return carte_pile;
@@ -309,7 +308,7 @@ int tourJoueur(int carte_joueur[], int *taille_main, Carte *jeu, int carte_pile,
                 piocherCarte(carte_joueur, taille_main, taille_deck, jeu);
             }
             cartes_a_piocher = 0;
-            couleur_joker = 'N';
+            couleur_active = 'N';
             printf("Appuyez sur Entree...");
             while (getchar() != '\n');
             return carte_pile;
@@ -320,8 +319,8 @@ int tourJoueur(int carte_joueur[], int *taille_main, Carte *jeu, int carte_pile,
     
     printf("\nCarte a battre: ");
     affiche_carte(carte_pile, jeu);
-    if (couleur_joker != 'N') {
-        printf("Couleur du joker: %c\n", couleur_joker);
+    if (couleur_active != 'N') {
+        printf("Couleur active: %c\n", couleur_active);
     }
     
     while (1) {
@@ -347,17 +346,17 @@ int tourJoueur(int carte_joueur[], int *taille_main, Carte *jeu, int carte_pile,
                     affiche_carte(nouvelle_carte, jeu);
                     
                     if (strcmp(jeu[nouvelle_carte].type, "JJ") == 0) {
-                        couleur_joker = choisirCouleur();
-                        printf("Couleur choisie: %c\n", couleur_joker);
+                        choisirCouleur();
+                        printf("Couleur choisie: %c\n", couleur_active);
                     }
                     else if (strcmp(jeu[nouvelle_carte].type, "+4") == 0) {
-                        couleur_joker = choisirCouleur();
+                        choisirCouleur();
                         cartes_a_piocher = 4;
-                        printf("Couleur choisie: %c\n", couleur_joker);
+                        printf("Couleur choisie: %c\n", couleur_active);
                     }
                     else {
                         appliquerEffet(jeu[nouvelle_carte], skip);
-                        couleur_joker = 'N';
+                        couleur_active = 'N';
                     }
                     
                     
@@ -382,7 +381,7 @@ int tourJoueur(int carte_joueur[], int *taille_main, Carte *jeu, int carte_pile,
                 }
             }
             
-            couleur_joker = 'N';
+            couleur_active = 'N';
             printf("Appuyez sur Entree...");
             while (getchar() != '\n');
             return carte_pile;
@@ -408,17 +407,17 @@ int tourJoueur(int carte_joueur[], int *taille_main, Carte *jeu, int carte_pile,
             
             // Gérer les jokers
             if (strcmp(jeu[carte_posee].type, "JJ") == 0) {
-                couleur_joker = choisirCouleur();
-                printf("Couleur choisie: %c\n", couleur_joker);
+                choisirCouleur();
+                printf("Couleur choisie: %c\n", couleur_active);
             }
             else if (strcmp(jeu[carte_posee].type, "+4") == 0) {
-                couleur_joker = choisirCouleur();
+                choisirCouleur();
                 cartes_a_piocher = 4;
-                printf("Couleur choisie: %c\n", couleur_joker);
+                printf("Couleur choisie: %c\n", couleur_active);
             }
             else {
                 appliquerEffet(jeu[carte_posee], skip);
-                couleur_joker = 'N';
+                couleur_active = 'N';
             }
             
             
