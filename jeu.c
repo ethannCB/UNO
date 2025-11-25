@@ -9,8 +9,9 @@ char couleur_joker = 'N';
 
 
 int distribuer_carte(int carte_joueur[], int carte_ia[], Carte *jeu, int taille) {
-    (void)jeu;
-    int index_deck = taille - 1;
+    //distribution des cartes aux joueurs
+    (void)jeu; //vide la variable non utilisée pour eviter les erreurs
+    int index_deck = taille - 1; 
     
     for (int i = 0; i < 7; i++) {
         carte_joueur[i] = index_deck--;
@@ -22,7 +23,8 @@ int distribuer_carte(int carte_joueur[], int carte_ia[], Carte *jeu, int taille)
 
 
 void Pioche(Carte *jeu, int taille) {
-    (void)jeu;
+    //fonction qui affiche le nombre de cartes restantes dans le deck
+    (void)jeu; //vide la variable non utilisée pour eviter les erreurs
     if (taille <= 0) {
         printf("Le jeu est vide.\n");
     } else {
@@ -31,6 +33,7 @@ void Pioche(Carte *jeu, int taille) {
 }
 
 int piocherCarte(int *main_joueur, int *taille_main, int *taille_deck, Carte *jeu) {
+    //fonction quidistribue une carte a un joueur précis et returne l'index de la carte piochée
     (void)jeu;
     if (*taille_deck <= 0) {
         printf("Plus de cartes!\n");
@@ -45,6 +48,8 @@ int piocherCarte(int *main_joueur, int *taille_main, int *taille_deck, Carte *je
 }
 
 int CartePosee(int index_jeu, int index_joueur, Carte *jeu) {
+    //fonction qui vérifie si une carte peut être posée
+
     // Jokers peuvent toujours être posés
     if (strcmp(jeu[index_joueur].type, "JJ") == 0 || 
         strcmp(jeu[index_joueur].type, "+4") == 0) {
@@ -62,9 +67,12 @@ int CartePosee(int index_jeu, int index_joueur, Carte *jeu) {
         return strcmp(jeu[index_joueur].type, "+2") == 0;
     }
     
+    // Vérifier la couleur ou le type
     if (jeu[index_joueur].couleur == couleur_a_battre) {
         return 1;
     }
+
+    // Vérifier le type
     if (strcmp(jeu[index_joueur].type, jeu[index_jeu].type) == 0) {
         return 1;
     }
@@ -74,14 +82,21 @@ int CartePosee(int index_jeu, int index_joueur, Carte *jeu) {
 
 
 void appliquerEffet(Carte carte, int *tour_suivant_skip) {
+    //fonction qui applique l'effet d'une carte spéciale en modifiant les variables adequates modifiéespar celle-ci
+
+    //si +2 ajouter 2 carte a la variable 'cartes_a_piocher'
     if (strcmp(carte.type, "+2") == 0) {
         cartes_a_piocher += 2;
         printf(">> +2! Total a piocher: %d cartes.\n", cartes_a_piocher);
     }
+
+    //si PS passer le tour du joueur suivant en mettant la variable 'tour_suivant_skip' a 1
     else if (strcmp(carte.type, "PS") == 0) {
         *tour_suivant_skip = 1;
         printf(">> Passer! Le joueur suivant passe son tour.\n");
     }
+
+    //si RV inverser le sens du jeu en multipliant la variable 'sens_jeu' par -1
     else if (strcmp(carte.type, "RV") == 0) {
         sens_jeu *= -1;
         printf(">> Inversion! Le sens change.\n");
@@ -89,6 +104,7 @@ void appliquerEffet(Carte carte, int *tour_suivant_skip) {
 }
 
 char choisirCouleur() {
+    //fonction permettant le choix de la couleur désiré par les joueurs (sera utilisé pour les jokers)+ si non choix par defaut rouge
     char choix;
     printf("Choisissez une couleur (R/J/B/V): ");
     scanf(" %c", &choix);
@@ -102,6 +118,7 @@ char choisirCouleur() {
 }
 
 int peutContrer(int *main, int taille, Carte *jeu) {
+    //fonction qui vérifie si le joueur peut contrer dans notre uno les +2
     for (int i = 0; i < taille; i++) {
         if (strcmp(jeu[main[i]].type, "+2") == 0) {
             return 1;
@@ -112,6 +129,7 @@ int peutContrer(int *main, int taille, Carte *jeu) {
 
 
 int verifierBluff(int *main_joueur, int taille, Carte *jeu, int carte_pile) {
+    //fonction verifiant si le joueur a une carte de la même couleur que la carte sur la pile return 1 ou 0
     for (int i = 0; i < taille; i++) {
         if (jeu[main_joueur[i]].couleur == jeu[carte_pile].couleur) {
             return 1;
@@ -121,14 +139,18 @@ int verifierBluff(int *main_joueur, int taille, Carte *jeu, int carte_pile) {
 }
 
 int tour(int carte_joueur[], int *taille_main, Carte *jeu, int carte_pile, int *taille_deck, int *skip) {
+    //fonction qui gère le tour de l'IA et returne l'index de la carte jouée
     if (*skip) {
         printf("IA passe son tour.\n");
         *skip = 0;
         return carte_pile;
     }
     
+    //cette partie est le cas ou la carte sur la pile est un +2
     if (cartes_a_piocher > 0 && strcmp(jeu[carte_pile].type, "+2") == 0) {
+        //utilisation de PeutContrer
         if (peutContrer(carte_joueur, *taille_main, jeu)) {
+            //on défausse sa carte et ajoutons +2 au compteur 
             for (int i = 0; i < *taille_main; i++) {
                 if (strcmp(jeu[carte_joueur[i]].type, "+2") == 0) {
                     int carte_posee = carte_joueur[i];
@@ -143,6 +165,7 @@ int tour(int carte_joueur[], int *taille_main, Carte *jeu, int carte_pile, int *
                     return carte_posee;
                 }
             }
+        //sinon pioche les cartes
         } else {
             printf("IA pioche %d cartes.\n", cartes_a_piocher);
             for (int i = 0; i < cartes_a_piocher; i++) {
@@ -196,13 +219,13 @@ int tour(int carte_joueur[], int *taille_main, Carte *jeu, int carte_pile, int *
     printf("IA pioche.\n");
     int nouvelle_carte = piocherCarte(carte_joueur, taille_main, taille_deck, jeu);
     
-    
-    if (nouvelle_carte >= 0 && CartePosee(carte_pile, nouvelle_carte, jeu)) {// verifie si la carte piochée peut être jouée
+    // verifie si la carte piochée peut être jouée
+    if (nouvelle_carte >= 0 && CartePosee(carte_pile, nouvelle_carte, jeu)) {
         printf("IA peut jouer la carte piochee!\n");
         (*taille_main)--;
         printf("IA pose : ");
         affiche_carte(nouvelle_carte, jeu);
-        
+        //si joker ou +4 ca implique un changement de couleur, ici on le fait aléatoirement
         if (strcmp(jeu[nouvelle_carte].type, "JJ") == 0 || 
             strcmp(jeu[nouvelle_carte].type, "+4") == 0) {
             char couleurs[] = {'R', 'J', 'B', 'V'};
@@ -219,6 +242,7 @@ int tour(int carte_joueur[], int *taille_main, Carte *jeu, int carte_pile, int *
 
 
 void afficherMain(int carte_joueur[], int taille_main, Carte *jeu) {
+    //fonction qui affiche la main du joueur voulu
     printf("\nVos cartes:\n");
     for (int i = 0; i < taille_main; i++) {
         printf("%d. ", i + 1);
